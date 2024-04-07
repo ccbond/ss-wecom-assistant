@@ -1,0 +1,21 @@
+[API]
+Addr = "0.0.0.0:1107"
+BasePatj = ""
+[Admin]
+Addr = "0.0.0.0:10000"
+BasePath = ""
+Secret = ""
+[database]
+port = 3306
+user = "root"
+type = "mysql"
+db_name = "nono"
+init_conn = 20
+max_conn = 200
+[redis]
+port = 6379
+user = "root"
+init_conn = 30
+max_conn = 120
+[log]
+log_level = "info"
