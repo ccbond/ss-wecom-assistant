@@ -49,7 +49,7 @@ func main() {
 	registerSignal(shutdownChannel)
 	args_parse()
 
-	configFilePath := "./conf/config.toml"
+	configFilePath := "/usr/conf/config.toml"
 	config.Init(configFilePath)
 	c := config.Get()
 
