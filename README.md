@@ -68,3 +68,14 @@ This project integrates the OpenAI Assistant API with WeChat Work (企业微信)
 
 Q: Can I customize the bot's responses?
 A: Yes, response behavior can be customized by editing the response templates in the configuration.
+
+8. Docker build
+
+```
+docker build -t ss-wecom-assistant:0.1.0 .
+- local
+docker run --env-file .env hgamiui9/ss-wecom-assistant:0.1.0
+
+-online
+docker pull hgamiui9/ss-wecom-assistant:0.1.0
+```
