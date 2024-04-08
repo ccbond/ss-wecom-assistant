@@ -53,8 +53,6 @@ func main() {
 	config.Init(configFilePath)
 	c := config.Get()
 
-	println("config: ", c)
-
 	openaiClient := openai.NewClient(c.OpenAIConfig.ApiKey)
 
 	weComApp, err := work.NewWork(&work.UserConfig{

@@ -10,4 +10,4 @@ EXPOSE 1107
 RUN cd /usr && mkdir conf
 COPY ./conf/config.toml /usr/conf/config.toml
 COPY --from=builder /app/ss-wecom-assistant .
-CMD ["./ss-wecom-assistant"]
+CMD ["./ss-wecom-assistant", "-e", "online"]
