@@ -7,9 +7,9 @@ import (
 	"flag"
 	"os"
 	"os/signal"
-	"ss-assistant/internal/config"
-	"ss-assistant/internal/server"
-	"ss-assistant/internal/services"
+	"ss-wecom-assistant/internal/config"
+	"ss-wecom-assistant/internal/server"
+	"ss-wecom-assistant/internal/services"
 	"syscall"
 
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"

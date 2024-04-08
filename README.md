@@ -1,1 +1,1 @@
-# ss-assistant
+# ss-wecom-assistant

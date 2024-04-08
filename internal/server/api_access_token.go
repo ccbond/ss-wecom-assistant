@@ -5,7 +5,7 @@ package server
 
 import (
 	"errors"
-	"ss-assistant/internal/util/api"
+	"ss-wecom-assistant/internal/util/api"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

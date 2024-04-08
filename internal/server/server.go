@@ -4,9 +4,9 @@
 package server
 
 import (
-	"ss-assistant/internal/config"
-	"ss-assistant/internal/logger"
-	"ss-assistant/internal/services"
+	"ss-wecom-assistant/internal/config"
+	"ss-wecom-assistant/internal/logger"
+	"ss-wecom-assistant/internal/services"
 
 	"github.com/SyntSugar/ss-infra-go/api/server"
 	"github.com/SyntSugar/ss-infra-go/log"

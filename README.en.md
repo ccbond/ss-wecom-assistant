@@ -1,14 +1,14 @@
-# ss-assistant
+# ss-wecom-assistant
 
 [Chinese Version](./README.md)
 
 ## Introduction
 
-ss-assistant is the most emotionally-rich chatbot implemented in Go, currently supporting deployment on the WeChat Official Account platform.
+ss-wecom-assistant is the most emotionally-rich chatbot implemented in Go, currently supporting deployment on the WeChat Official Account platform.
 
 ## Architecture
 
-![architecture](./assest/ss-assistant-architecture.png)
+![architecture](./assest/ss-wecom-assistant-architecture.png)
 
 ## Implementation and features
 
@@ -45,7 +45,7 @@ port = 3306
 user = "root"
 password = "123456"
 type = "mysql"
-db_name = "ss-assistant"
+db_name = "ss-wecom-assistant"
 init_conn = 20
 max_conn = 200
 
@@ -119,4 +119,4 @@ If you like or are using this project to learn or start your solution, please gi
 
 ## License
 
-ss-assistant is released under the MIT License. For more details, please see the LICENSE file.
+ss-wecom-assistant is released under the MIT License. For more details, please see the LICENSE file.

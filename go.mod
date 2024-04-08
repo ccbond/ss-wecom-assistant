@@ -1,4 +1,4 @@
-module ss-assistant
+module ss-wecom-assistant
 
 go 1.21
 
