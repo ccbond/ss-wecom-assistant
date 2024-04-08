@@ -7,5 +7,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 EXPOSE 1107
+RUN mkdir conf
+COPY ./conf/config.toml /conf
 COPY --from=builder /app/ss-wecom-assistant .
 CMD ["./ss-wecom-assistant"]
