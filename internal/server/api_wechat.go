@@ -4,82 +4,82 @@
 package server
 
 import (
-	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-	"ss-assistant/internal/services"
 
-	"github.com/ArtisanCloud/PowerLibs/fmt"
-	"github.com/ArtisanCloud/PowerWeChat/src/kernel"
-	"github.com/ArtisanCloud/PowerWeChat/src/kernel/contract"
-	"github.com/ArtisanCloud/PowerWeChat/src/work/server/handlers/models"
 	"github.com/gin-gonic/gin"
-	"github.com/silenceper/wechat/v2/officialaccount/message"
 )
 
 // WechatCheck wechat check
 func (srv *Server) wechatCheck(ctx *gin.Context) {
-	rs, err := srv.svcs.WechatService.weCom.Server.Serve(ctx.Request)
+	rs, err := srv.svcs.WechatService.Server(ctx.Request)
 	if err != nil {
 		panic(err)
 	}
 	text, _ := ioutil.ReadAll(rs.Body)
-	c.String(http.StatusOK, string(text))
+	srv.logger.Info(string(text))
+
+	ctx.String(http.StatusOK, string(text))
 }
 
 // Reply reply text message
-func (srv *Server) Reply(ctx *gin.Context) *message.Reply {
-	rs, err := services.NewWeComService().weCom.Notify(c.Request, func(event contract.EventInterface) interface{} {
-		fmt.Dump("event", event)
-		//return  "handle callback"
+func (srv *Server) wechatReply(ctx *gin.Context) {
+	content, toUser, msgID, openKFID, err := srv.svcs.WechatService.Notify(ctx.Request)
+	if err != nil {
+		panic(err)
+	}
 
-		// event output:
-		//{
-		//  "EventInterface": null,
-		//  "XMLName": {
-		//    "Space": "",
-		//      "Local": "xml"
-		//  },
-		//  "Text": "",
-		//  "ToUserName": "ww454dfb9d6f6d432a",
-		//  "FromUserName": "sys",
-		//  "CreateTime": "1654861516",
-		//  "MsgType": "event",
-		//  "Event": "change_contact",
-		//  "ChangeType": "update_user",
-		//  "Content": "PHhtbD48VG9Vc2VyTmFtZT48IVtDREFUQVt3dzQ1NGRmYjlkNmY2ZDQzMmFdXT48L1RvVXNlck5hbWU+PEZyb21Vc2VyTmFtZT48IVtDREFUQVtzeXNdXT48L0Zyb21Vc2VyTmFtZT48Q3JlYXRlVGltZT4xNjU0ODYxNTE2PC9DcmVhdGVUaW1lPjxNc2dUeXBlPjwhW0NEQVRBW2V2ZW50XV0+PC9Nc2dUeXBlPjxFdmVudD48IVtDREFUQVtjaGFuZ2VfY29udGFjdF1dPjwvRXZlbnQ+PENoYW5nZVR5cGU+PCFbQ0RBVEFbdXBkYXRlX3VzZXJdXT48L0NoYW5nZVR5cGU+PFVzZXJJRD48IVtDREFUQVtXYW5nQ2hhb1lpXV0+PC9Vc2VySUQ+PEFkZHJlc3M+PCFbQ0RBVEFbYWRkci4uLl1dPjwvQWRkcmVzcz48L3htbD4="
-		//}
-
-		// 这里需要获取到事件类型，然后把对应的结构体传递进去进一步解析
-		// 所有包含的结构体请参考： https://github.com/ArtisanCloud/PowerWeChat/tree/master/src/work/server/handlers/models
-		if event.GetEvent() == models.CALLBACK_EVENT_CHANGE_CONTACT && event.GetChangeType() == models.CALLBACK_EVENT_CHANGE_TYPE_CREATE_PARTY {
-			msg := models.EventPartyCreate{}
-			err := event.ReadMessage(&msg)
-			if err != nil {
-				println(err.Error())
-				return "error"
-			}
-			fmt.Dump(msg)
+	go func() {
+		threadID, err := srv.svcs.ChatService.CreateThread(ctx, content, true)
+		if err != nil {
+			fmt.Println("create thread error", err)
+			panic(err)
 		}
+		fmt.Println("threadID", threadID)
 
-		// 假设员工给应用发送消息，这里可以直接回复消息文本，
-		// return  "I'm recv..."
+		messageID, err := srv.svcs.ChatService.CreateMessage(ctx, threadID, content)
+		if err != nil {
+			fmt.Println("create message error", err)
+			panic(err)
+		}
+		fmt.Println("messageID", messageID)
 
-		// 这里回复success告诉微信我收到了，后续需要回复用户信息可以主动调发消息接口
-		return kernel.SUCCESS_EMPTY_RESPONSE
-	})
-	if err != nil {
-		panic(err)
-	}
+		runID, err := srv.svcs.ChatService.CreateRun(ctx, threadID, srv.config.OpenAIConfig.AssistantID)
+		if err != nil {
+			fmt.Println("create run error", err)
+			panic(err)
+		}
+		fmt.Println("runID", runID)
 
-	// 选择1： 直接把gin context writer传入，会自动回复。
-	err = rs.Send(c.Writer)
-	if err != nil {
-		panic(err)
-	}
+		err = srv.svcs.ChatService.WaitOnRun(ctx, threadID, runID)
+		if err != nil {
+			fmt.Println("wait on run error", err)
+			panic(err)
+		}
+		fmt.Println("wait on run success")
 
-	// 选择2： 或者是把内容读取出来，回复
-	//text, _ := ioutil.ReadAll(rs.Body)
-	//c.String(http.StatusOK, string(text))
+		reply, err := srv.svcs.ChatService.GetResponse(ctx, threadID, messageID)
+		if err != nil {
+			fmt.Println("get response error", err)
+			panic(err)
+		}
+		fmt.Println("reply", reply)
 
+		if reply == "请您稍等，马上给您安排。" {
+			newOpenKFID := srv.config.WeChatConfig.ZJKFID
+			err = srv.svcs.WechatService.TransKF(ctx, newOpenKFID, toUser)
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			err = srv.svcs.WechatService.SendMsg(ctx, reply, toUser, openKFID, msgID)
+			if err != nil {
+				fmt.Println("senf msg error", err)
+				panic(err)
+			}
+		}
+	}()
+
+	ctx.String(http.StatusOK, string(""))
 }

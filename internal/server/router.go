@@ -11,7 +11,7 @@ func setupAPIRouters(srv *Server) {
 	wechatApi := api.Group("/wx")
 	{
 		wechatApi.GET("/auto_reply", srv.wechatCheck)
-		wechatApi.POST("/auto_reply", srv.wechatAutoReply)
+		wechatApi.POST("/auto_reply", srv.wechatReply)
 	}
 
 	manageApi := api.Group("/manage")

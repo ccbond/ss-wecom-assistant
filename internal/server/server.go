@@ -5,21 +5,13 @@ package server
 
 import (
 	"ss-assistant/internal/config"
-	"ss-assistant/internal/datastore"
 	"ss-assistant/internal/logger"
 	"ss-assistant/internal/services"
-	"sync"
 
 	"github.com/SyntSugar/ss-infra-go/api/server"
 	"github.com/SyntSugar/ss-infra-go/log"
-	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
-
-type Cache struct {
-	Redis   *redis.Client
-	SyncMap *sync.Map
-}
 
 type Services struct {
 	WechatService services.WechatService
@@ -34,7 +26,7 @@ type Server struct {
 }
 
 // NewServer creates a new server instance.
-func NewServer(cfg *config.Config, db *datastore.DataStore, services *Services) (*Server, error) {
+func NewServer(cfg *config.Config, services *Services) (*Server, error) {
 	if err := logger.Init(cfg.LogConfig.LogLevel); err != nil {
 		return nil, err
 	}
@@ -75,6 +67,5 @@ func (srv *Server) Shutdown() {
 	if err := srv.apiServer.Shutdown(); err != nil {
 		srv.logger.With(zap.String("err", err.Error())).Error("Shutdown error")
 	}
-	datastore.Close()
 	srv.logger.Info("The server was shutdown normally, see you lala.")
 }

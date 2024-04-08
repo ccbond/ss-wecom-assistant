@@ -8,12 +8,11 @@ import (
 	"os"
 	"os/signal"
 	"ss-assistant/internal/config"
-	"ss-assistant/internal/datastore"
 	"ss-assistant/internal/server"
 	"ss-assistant/internal/services"
 	"syscall"
 
-	"github.com/ArtisanCloud/PowerWeChat/src/work"
+	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -56,16 +55,14 @@ func main() {
 
 	println("config: ", c)
 
-	datastore.Init(c)
-	defer datastore.Close()
-	db := datastore.Get()
-
 	openaiClient := openai.NewClient(c.OpenAIConfig.ApiKey)
 
 	weComApp, err := work.NewWork(&work.UserConfig{
-		CorpID:  c.WeChatConfig.AppID,       // 企业微信的app id，所有企业微信共用一个。
-		AgentID: c.WeChatConfig.AgentID,     // 内部应用的app id
-		Secret:  c.WeChatConfig.AgentSecret, // 内部应用的app secret
+		CorpID:  c.WeChatConfig.AppID,     // 企业微信的app id，所有企业微信共用一个。
+		AgentID: c.WeChatConfig.AgentID,   // 内部应用的app id
+		Secret:  c.WeChatConfig.AppSecret, // 内部应用的app secret
+		Token:   c.WeChatConfig.Token,
+		AESKey:  c.WeChatConfig.EncodingAESKey,
 		OAuth: work.OAuth{
 			Callback: "https://wecom.artisan-cloud.com/callback", //
 			Scopes:   nil,
@@ -73,23 +70,12 @@ func main() {
 		HttpDebug: true,
 	})
 
-	repos := &server.Repos{
-		EventReply:       repo.NewEventReply(db.DB),
-		SensitiveWords:   repo.NewSensitiveWord(db.DB),
-		SpecifiedMessage: repo.NewSpecifiedMessage(db.DB),
-		Users:            repo.NewUser(db.DB),
-		Usage:            repo.NewUsage(db.DB),
-		Subscription:     repo.NewSubscription(db.DB),
-		JDK:              repo.NewJDK(db.DB),
-		SystemPrompt:     repo.NewSystemPrompt(db.DB),
-	}
-
 	svcs := &server.Services{
-		WechatService: services.NewWechatService(weComApp),
+		WechatService: services.NewWeComService(weComApp, c.WeChatConfig.AgentID),
 		ChatService:   services.NewChatService(openaiClient),
 	}
 
-	server, err := server.NewServer(c, db, repos, svcs)
+	server, err := server.NewServer(c, svcs)
 	if err != nil {
 		panic("Failed to build new server, err: " + err.Error())
 	}

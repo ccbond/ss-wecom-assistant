@@ -1,13 +1,22 @@
 package services
 
+import (
+	"context"
+	"net/http"
+)
+
 type ChatService interface {
-	// CreateChatCompletion(string, string, string, int) (string, int, error)
-	// JudgmentUserMessage(context.Context, string) (int, error)
-	// CreateTranscription(context.Context, string) (string, error)
+	CreateMessage(context.Context, string, string) (string, error)
+	CreateThread(context.Context, string, bool) (string, error)
+	GetResponse(context.Context, string, string) (string, error)
+	WaitOnRun(context.Context, string, string) error
+	CreateRun(context.Context, string, string) (string, error)
 }
 
 type WechatService interface {
-	// GetServer(*http.Request, gin.ResponseWriter) *wxServer.Server
-	// GetAccessToken() (string, error)
-	// SendCustomerMessage(string, []string) error
+	Server(*http.Request) (*http.Response, error)
+	GetAccessToken() (string, error)
+	Notify(*http.Request) (string, string, string, string, error)
+	SendMsg(context.Context, string, string, string, string) error
+	TransKF(context.Context, string, string) error
 }

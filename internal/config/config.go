@@ -6,6 +6,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/BurntSushi/toml"
 	"github.com/SyntSugar/ss-infra-go/api/server"
@@ -17,40 +18,22 @@ type Server struct {
 	ServerPort int    `toml:"server_port"`
 }
 
-type Db struct {
-	Port     int    `toml:"port"`
-	User     string `toml:"user"`
-	Type     string `toml:"type"`
-	DbName   string `toml:"db_name"`
-	InitConn int    `toml:"init_conn"`
-	MaxConn  int    `toml:"max_conn"`
-	Host     string
-	Pwd      string
-}
-
-type Redis struct {
-	Port       int    `toml:"port"`
-	User       string `toml:"user"`
-	MaxRetries int    `toml:"max_retries"`
-	Host       string
-	Pwd        string
-}
-
 type Log struct {
 	LogLevel string `toml:"log_level"`
 }
 
 type WeChat struct {
 	AppID          string
-	AgentID        string
-	AgentSecret    string
+	AgentID        int
 	Token          string
 	EncodingAESKey string
 	AppSecret      string
+	ZJKFID         string
 }
 
 type OpenAI struct {
-	ApiKey string
+	ApiKey      string
+	AssistantID string
 }
 
 type AzureAI struct {
@@ -70,8 +53,6 @@ type Config struct {
 	Admin *server.AdminCfg
 
 	ServerConfig Server `toml:"server"`
-	DbConfig     Db     `toml:"database"`
-	RedisConfig  Redis  `toml:"redis"`
 	LogConfig    Log    `toml:"log"`
 	WeChatConfig WeChat
 	OpenAIConfig OpenAI
@@ -92,21 +73,26 @@ func Init(path string) {
 		}
 	}
 
-	c.DbConfig.Host = os.Getenv("DATABASE_HOST")
-	c.DbConfig.Pwd = os.Getenv("DATABASE_SECRET")
+	wechatAgentIDStr := os.Getenv("WECHAT_AGENT_ID")
 
-	c.RedisConfig.Host = os.Getenv("REDIS_HOST")
-	c.RedisConfig.Pwd = os.Getenv("REDIS_SECRET")
+	wechatAgentID, err := strconv.Atoi(wechatAgentIDStr)
+	if err != nil {
+		fmt.Println("Error converting WECHAT_AGENT_ID to an integer:", err)
+		return
+	}
 
 	c.WeChatConfig = WeChat{
 		AppID:          os.Getenv("WECHAT_APP_ID"),
+		AgentID:        wechatAgentID,
 		Token:          os.Getenv("WECHAT_TOKEN"),
 		EncodingAESKey: os.Getenv("WECHAT_ENCODEING_AES_KEY"),
 		AppSecret:      os.Getenv("WECHAT_APP_SECRET"),
+		ZJKFID:         os.Getenv("WECHAT_ZJKFID"),
 	}
 
 	c.OpenAIConfig = OpenAI{
-		ApiKey: os.Getenv("OPENAI_API_KEY"),
+		ApiKey:      os.Getenv("OPENAI_API_KEY"),
+		AssistantID: os.Getenv("OPENAI_ASSISTANT_ID"),
 	}
 
 	c.SecretConfig = Secret{
