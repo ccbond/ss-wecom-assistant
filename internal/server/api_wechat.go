@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -82,7 +84,7 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 		}
 		fmt.Println("reply", reply)
 
-		if reply == "请您稍等，马上给您安排。" {
+		if strings.Contains(reply, "请您稍等，马上给您安排。") {
 			content := "请联系我们的客服，马上帮您安排。"
 			err = srv.svcs.WechatService.SendMsg(ctx, content, toUser, openKFID, msgID)
 			if err != nil {
@@ -102,7 +104,9 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 				panic(err)
 			}
 		} else {
-			err = srv.svcs.WechatService.SendMsg(ctx, reply, toUser, openKFID, msgID)
+			reg := regexp.MustCompile(`【.*?】`)
+			cleanedReply := reg.ReplaceAllString(reply, "")
+			err = srv.svcs.WechatService.SendMsg(ctx, cleanedReply, toUser, openKFID, msgID)
 			if err != nil {
 				fmt.Println("senf msg error", err)
 				panic(err)

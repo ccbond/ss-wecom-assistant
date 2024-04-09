@@ -152,7 +152,7 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 		ToUser:   toUser,
 		OpenKfid: openKFID,
 		MsgID:    msgID,
-		MsgType:  "business_card",
+		MsgType:  "image",
 		Image: &request.RequestAccountServiceMsgImage{
 			MediaID: mediaID,
 		},
