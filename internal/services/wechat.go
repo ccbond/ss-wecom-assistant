@@ -152,7 +152,7 @@ func (w *wechatService) TransMP(ctx context.Context, userID string, toUser strin
 		ToUser:   toUser,
 		OpenKfid: openKFID,
 		MsgID:    msgID,
-		MsgType:  "text",
+		MsgType:  "business_card",
 		BusinessCard: &MsgBusinessCard{
 			UserID: userID,
 		},
