@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var globalThreadID map[string]string
+
 // WechatCheck wechat check
 func (srv *Server) wechatCheck(ctx *gin.Context) {
 	rs, err := srv.svcs.WechatService.Server(ctx.Request)
@@ -31,11 +33,15 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 	}
 
 	go func() {
-		threadID, err := srv.svcs.ChatService.CreateThread(ctx, content, true)
-		if err != nil {
-			fmt.Println("create thread error", err)
-			panic(err)
+		threadID, ok := globalThreadID[toUser]
+		if !ok {
+			threadID, err = srv.svcs.ChatService.CreateThread(ctx, content, true)
+			if err != nil {
+				panic(err)
+			}
+			globalThreadID[toUser] = threadID
 		}
+
 		fmt.Println("threadID", threadID)
 
 		messageID, err := srv.svcs.ChatService.CreateMessage(ctx, threadID, content)
