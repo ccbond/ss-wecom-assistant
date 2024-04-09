@@ -43,16 +43,16 @@ func (w *wechatService) Server(req *http.Request) (*http.Response, error) {
 
 func (w *wechatService) Notify(req *http.Request) (string, string, string, string, error) {
 	ctx := context.Background()
-	// kfIDs, err := w.weCom.AccountService.List(ctx)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Dump("kfIDs", kfIDs)
+	kfIDs, err := w.weCom.AccountService.List(ctx)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Dump("kfIDs", kfIDs)
 	openKFID := "wkiHeVBgAAckgxIrimL83KL9E10LtY0w"
 
 	token := ""
 
-	_, err := w.weCom.Server.Notify(req, func(event contract.EventInterface) interface{} {
+	_, err = w.weCom.Server.Notify(req, func(event contract.EventInterface) interface{} {
 		fmt.Dump("event", event)
 		if event.GetEvent() == models.CALLBACK_EVENT_KF_MSG_OR_EVENT && event.GetMsgType() == "text" {
 			msg := models.EventKFMsgOrEvent{}
@@ -122,13 +122,13 @@ func (w *wechatService) SendMsg(ctx context.Context, content string, toUser stri
 	return err
 }
 
-func (w *wechatService) TransKF(ctx context.Context, openKFID string, externalUserID string) error {
-	state, err := w.weCom.AccountServiceState.Get(ctx, openKFID, externalUserID)
+func (w *wechatService) TransKF(ctx context.Context, oldOpenKFID string, newOpenKFID string, externalUserID string) error {
+	state, err := w.weCom.AccountServiceState.Get(ctx, oldOpenKFID, externalUserID)
 	if err != nil {
 		return err
 	}
 	fmt.Dump("state", state)
 
-	_, err = w.weCom.AccountServiceState.Trans(ctx, openKFID, externalUserID, 3, state.ServicerUserID)
+	_, err = w.weCom.AccountServiceState.Trans(ctx, newOpenKFID, externalUserID, 3, state.ServicerUserID)
 	return err
 }

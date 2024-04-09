@@ -18,5 +18,5 @@ type WechatService interface {
 	GetAccessToken() (string, error)
 	Notify(*http.Request) (string, string, string, string, error)
 	SendMsg(context.Context, string, string, string, string) error
-	TransKF(context.Context, string, string) error
+	TransKF(context.Context, string, string, string) error
 }

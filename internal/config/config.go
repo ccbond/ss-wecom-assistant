@@ -29,6 +29,7 @@ type WeChat struct {
 	EncodingAESKey string
 	AppSecret      string
 	ZJKFID         string
+	KFID           string
 }
 
 type OpenAI struct {
@@ -88,6 +89,7 @@ func Init(path string) {
 		EncodingAESKey: os.Getenv("WECHAT_ENCODEING_AES_KEY"),
 		AppSecret:      os.Getenv("WECHAT_APP_SECRET"),
 		ZJKFID:         os.Getenv("WECHAT_ZJKFID"),
+		KFID:           os.Getenv("WECHAT_KFID"),
 	}
 
 	c.OpenAIConfig = OpenAI{
