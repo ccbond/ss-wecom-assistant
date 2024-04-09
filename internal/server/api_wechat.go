@@ -16,17 +16,17 @@ import (
 )
 
 var globalThreadID map[string]string
-var mediaID string
+var imageID string
 var lastUpdateTime int64
 
 func init() {
 	globalThreadID = make(map[string]string)
-	mediaID = ""
-	lastUpdateTime = 0
+	imageID = "3ukv8tceVpEixWeHFs2bBonb_u-EhjjwgaTFcn7gBfQUMv7NyEA_0fydLu5b_uMvy"
+	lastUpdateTime = time.Now().Unix()
 }
 
 func (srv *Server) getWEM(ctx context.Context) (string, error) {
-	if len(mediaID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
+	if len(imageID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
 		mediaID, err := srv.svcs.WechatService.UpdateImage(ctx)
 		if err != nil {
 			return "", err
@@ -37,7 +37,7 @@ func (srv *Server) getWEM(ctx context.Context) (string, error) {
 
 		return mediaID, nil
 	}
-	return mediaID, nil
+	return imageID, nil
 }
 
 // WechatCheck wechat check
