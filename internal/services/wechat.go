@@ -10,9 +10,9 @@ import (
 	"github.com/ArtisanCloud/PowerLibs/fmt"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/contract"
+	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/power"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/accountService/message/request"
-	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/accountService/message/response"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/server/handlers/models"
 )
 
@@ -147,20 +147,33 @@ func (w *wechatService) TransKF(ctx context.Context, oldOpenKFID string, newOpen
 	return err
 }
 
-func (w *wechatService) TransMP(ctx context.Context, userID string, toUser string, openKFID string, msgID string) error {
-	messages := &RequestAccountServiceSendMsg2{
+func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser string, openKFID string, msgID string) error {
+	messages := &request.RequestAccountServiceSendMsg{
 		ToUser:   toUser,
 		OpenKfid: openKFID,
 		MsgID:    msgID,
 		MsgType:  "business_card",
-		BusinessCard: &MsgBusinessCard{
-			UserID: userID,
+		Image: &request.RequestAccountServiceMsgImage{
+			MediaID: mediaID,
 		},
 	}
 
-	result := &response.ResponseAccountServiceSendMsgOnEvent{}
-
-	_, err := w.weCom.AccountServiceMessage.BaseClient.HttpPostJson(ctx, "cgi-bin/kf/send_msg", messages, nil, nil, result)
-	fmt.Dump("res", result)
+	res, err := w.weCom.AccountServiceMessage.SendMsg(ctx, messages)
+	fmt.Dump("res", res)
 	return err
+}
+
+func (w *wechatService) UpdateImage(ctx context.Context) (string, error) {
+	name := "ewm.jpg"
+	value := ""
+
+	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/qwewm.jpg", &power.HashMap{
+		"name":  name,
+		"value": value,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return media.MediaID, nil
 }
