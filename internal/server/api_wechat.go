@@ -25,6 +25,18 @@ func init() {
 	lastUpdateTime = 0
 }
 
+func (srv *Server) getWEM(ctx context.Context) (string, error) {
+	if len(mediaID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
+		mediaID, err := srv.svcs.WechatService.UpdateImage(ctx)
+		if err != nil {
+			return "", err
+		}
+		lastUpdateTime = time.Now().Unix()
+		return mediaID, nil
+	}
+	return mediaID, nil
+}
+
 // WechatCheck wechat check
 func (srv *Server) wechatCheck(ctx *gin.Context) {
 	rs, err := srv.svcs.WechatService.Server(ctx.Request)
@@ -92,14 +104,14 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 				panic(err)
 			}
 
-			mediaID, err := srv.getWEM(ctx)
+			newMediaID, err := srv.getWEM(ctx)
 			if err != nil {
 				panic(err)
 			}
 
-			fmt.Println("mediaID", mediaID)
+			fmt.Println("mediaID", newMediaID)
 
-			err = srv.svcs.WechatService.TransEWM(ctx, mediaID, toUser, openKFID, msgID)
+			err = srv.svcs.WechatService.TransEWM(ctx, newMediaID, toUser, openKFID, msgID)
 			if err != nil {
 				panic(err)
 			}
@@ -115,16 +127,4 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 	}()
 
 	ctx.String(http.StatusOK, string(""))
-}
-
-func (srv *Server) getWEM(ctx context.Context) (string, error) {
-	if len(mediaID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
-		mediaID, err := srv.svcs.WechatService.UpdateImage(ctx)
-		if err != nil {
-			return "", err
-		}
-		lastUpdateTime = time.Now().Unix()
-		return mediaID, nil
-	}
-	return mediaID, nil
 }
