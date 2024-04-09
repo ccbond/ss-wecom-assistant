@@ -165,7 +165,7 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 }
 
 func (w *wechatService) UpdateImage(ctx context.Context) (string, error) {
-	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/media.PNG", &power.HashMap{
+	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/media.png", &power.HashMap{
 		"name": "media",
 	})
 	if err != nil {
