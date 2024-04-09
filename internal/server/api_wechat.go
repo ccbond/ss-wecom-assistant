@@ -14,6 +14,14 @@ import (
 )
 
 var globalThreadID map[string]string
+var mediaID string
+var lastUpdateTime int64
+
+func init() {
+	globalThreadID = make(map[string]string)
+	mediaID = ""
+	lastUpdateTime = 0
+}
 
 // WechatCheck wechat check
 func (srv *Server) wechatCheck(ctx *gin.Context) {
@@ -104,9 +112,6 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 
 	ctx.String(http.StatusOK, string(""))
 }
-
-var mediaID string
-var lastUpdateTime int64
 
 func (srv *Server) getWEM(ctx context.Context) (string, error) {
 	if len(mediaID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
