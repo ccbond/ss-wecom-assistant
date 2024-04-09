@@ -32,6 +32,9 @@ func (srv *Server) getWEM(ctx context.Context) (string, error) {
 			return "", err
 		}
 		lastUpdateTime = time.Now().Unix()
+
+		time.Sleep(2000 * time.Millisecond)
+
 		return mediaID, nil
 	}
 	return mediaID, nil
