@@ -10,7 +10,6 @@ import (
 	"github.com/ArtisanCloud/PowerLibs/fmt"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/contract"
-	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/power"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/accountService/message/request"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/server/handlers/models"
@@ -165,9 +164,7 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 }
 
 func (w *wechatService) UpdateImage(ctx context.Context) (string, error) {
-	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/media.png", &power.HashMap{
-		"name": "media",
-	})
+	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/qwewm.png", nil)
 	if err != nil {
 		return "", err
 	}
