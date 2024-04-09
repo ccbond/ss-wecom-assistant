@@ -67,6 +67,12 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 		fmt.Println("reply", reply)
 
 		if reply == "请您稍等，马上给您安排。" {
+			content := "请联系客服，我们帮您安排。"
+			err = srv.svcs.WechatService.SendMsg(ctx, content, toUser, openKFID, msgID)
+			if err != nil {
+				fmt.Println("senf msg error", err)
+				panic(err)
+			}
 			err = srv.svcs.WechatService.TransMP(ctx, "ivychenChenXinYu", toUser, openKFID, msgID)
 			if err != nil {
 				panic(err)
