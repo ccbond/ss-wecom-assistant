@@ -9,6 +9,6 @@ WORKDIR /root/
 EXPOSE 1107
 RUN cd /usr && mkdir conf
 COPY ./conf/config.toml /usr/conf/config.toml
-COPY ./asset/qwewm2.PNG /usr/conf/qwewm2.PNG
+COPY ./asset/media.PNG /usr/conf/media.PNG
 COPY --from=builder /app/ss-wecom-assistant .
 CMD ["./ss-wecom-assistant", "-e", "online"]
