@@ -19,5 +19,5 @@ type WechatService interface {
 	Notify(*http.Request) (string, string, string, string, error)
 	SendMsg(context.Context, string, string, string, string) error
 	TransKF(context.Context, string, string, string) error
-	TransMP(context.Context, string, string, string) error
+	TransMP(context.Context, string, string, string, string) error
 }

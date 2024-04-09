@@ -12,6 +12,7 @@ import (
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/contract"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/accountService/message/request"
+	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/accountService/message/response"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work/server/handlers/models"
 )
 
@@ -107,6 +108,19 @@ func (w *wechatService) Notify(req *http.Request) (string, string, string, strin
 	return lastContent, toUser, msgID, openKFID, nil
 }
 
+type MsgBusinessCard struct {
+	UserID string `json:"userid"`
+}
+
+type RequestAccountServiceSendMsg2 struct {
+	ToUser       string                                `json:"touser"`
+	OpenKfid     string                                `json:"open_kfid"`
+	MsgID        string                                `json:"msgid,omitempty"`
+	MsgType      string                                `json:"msgtype,omitempty"`
+	Text         *request.RequestAccountServiceMsgText `json:"text,omitempty"`
+	BusinessCard *MsgBusinessCard                      `json:"business_card,omitempty"`
+}
+
 func (w *wechatService) SendMsg(ctx context.Context, content string, toUser string, openKFID string, msgID string) error {
 	messages := &request.RequestAccountServiceSendMsg{
 		ToUser:   toUser,
@@ -133,11 +147,20 @@ func (w *wechatService) TransKF(ctx context.Context, oldOpenKFID string, newOpen
 	return err
 }
 
-func (w *wechatService) TransMP(ctx context.Context, oldOpenKFID string, newOpenKFID string, externalUserID string) error {
-	follerUsers, err := w.weCom.ExternalContact.GetFollowUsers(ctx)
-	if err != nil {
-		return err
+func (w *wechatService) TransMP(ctx context.Context, userID string, toUser string, openKFID string, msgID string) error {
+	messages := &RequestAccountServiceSendMsg2{
+		ToUser:   toUser,
+		OpenKfid: openKFID,
+		MsgID:    msgID,
+		MsgType:  "text",
+		BusinessCard: &MsgBusinessCard{
+			UserID: userID,
+		},
 	}
-	fmt.Dump("follerUsers", follerUsers)
+
+	result := &response.ResponseAccountServiceSendMsgOnEvent{}
+
+	_, err := w.weCom.AccountServiceMessage.BaseClient.HttpPostJson(ctx, "cgi-bin/kf/send_msg", messages, nil, nil, result)
+	fmt.Dump("res", result)
 	return err
 }

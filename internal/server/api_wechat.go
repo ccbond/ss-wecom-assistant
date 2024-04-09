@@ -67,9 +67,7 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 		fmt.Println("reply", reply)
 
 		if reply == "请您稍等，马上给您安排。" {
-			newOpenKFID := srv.config.WeChatConfig.ZJKFID
-			oldOpenKFID := srv.config.WeChatConfig.KFID
-			err = srv.svcs.WechatService.TransMP(ctx, oldOpenKFID, newOpenKFID, toUser)
+			err = srv.svcs.WechatService.TransMP(ctx, "ivychenChenXinYu", toUser, openKFID, msgID)
 			if err != nil {
 				panic(err)
 			}
