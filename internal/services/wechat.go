@@ -132,3 +132,12 @@ func (w *wechatService) TransKF(ctx context.Context, oldOpenKFID string, newOpen
 	_, err = w.weCom.AccountServiceState.Trans(ctx, newOpenKFID, externalUserID, 3, state.ServicerUserID)
 	return err
 }
+
+func (w *wechatService) TransMP(ctx context.Context, oldOpenKFID string, newOpenKFID string, externalUserID string) error {
+	follerUsers, err := w.weCom.ExternalContact.GetFollowUsers(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Dump("follerUsers", follerUsers)
+	return err
+}
