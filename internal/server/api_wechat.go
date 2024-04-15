@@ -118,6 +118,12 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 			if err != nil {
 				panic(err)
 			}
+
+			err = srv.svcs.WechatService.TransKF(ctx, openKFID, srv.config.WeChatConfig.ZJKFID, toUser)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("转接成功")
 		} else {
 			reg := regexp.MustCompile(`【.*?】`)
 			cleanedReply := reg.ReplaceAllString(reply, "")
