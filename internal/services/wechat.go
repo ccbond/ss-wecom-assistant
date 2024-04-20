@@ -111,15 +111,6 @@ type MsgBusinessCard struct {
 	UserID string `json:"userid"`
 }
 
-type RequestAccountServiceSendMsg2 struct {
-	ToUser       string                                `json:"touser"`
-	OpenKfid     string                                `json:"open_kfid"`
-	MsgID        string                                `json:"msgid,omitempty"`
-	MsgType      string                                `json:"msgtype,omitempty"`
-	Text         *request.RequestAccountServiceMsgText `json:"text,omitempty"`
-	BusinessCard *MsgBusinessCard                      `json:"business_card,omitempty"`
-}
-
 func (w *wechatService) SendMsg(ctx context.Context, content string, toUser string, openKFID string, msgID string) error {
 	messages := &request.RequestAccountServiceSendMsg{
 		ToUser:   toUser,
@@ -151,8 +142,8 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 		ToUser:   toUser,
 		OpenKfid: openKFID,
 		MsgID:    msgID,
-		MsgType:  "image",
-		Image: &request.RequestAccountServiceMsgImage{
+		MsgType:  "file",
+		File: &request.RequestAccountServiceMsgFile{
 			MediaID: mediaID,
 		},
 	}
