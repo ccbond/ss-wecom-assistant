@@ -21,7 +21,7 @@ var lastUpdateTime int64
 
 func init() {
 	globalThreadID = make(map[string]string)
-	imageID = "3ukv8tceVpEixWeHFs2bBonb_u-EhjjwgaTFcn7gBfQUMv7NyEA_0fydLu5b_uMvy"
+	imageID = ""
 	lastUpdateTime = time.Now().Unix()
 }
 
@@ -34,6 +34,7 @@ func (srv *Server) getWEM(ctx context.Context) (string, error) {
 		lastUpdateTime = time.Now().Unix()
 
 		time.Sleep(2000 * time.Millisecond)
+		imageID = mediaID
 
 		return mediaID, nil
 	}
@@ -116,14 +117,10 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 
 			err = srv.svcs.WechatService.TransEWM(ctx, newMediaID, toUser, openKFID, msgID)
 			if err != nil {
+				fmt.Println("send image error", err)
 				panic(err)
 			}
 
-			err = srv.svcs.WechatService.TransKF(ctx, openKFID, srv.config.WeChatConfig.ZJKFID, toUser)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("转接成功")
 		} else {
 			reg := regexp.MustCompile(`【.*?】`)
 			cleanedReply := reg.ReplaceAllString(reply, "")
