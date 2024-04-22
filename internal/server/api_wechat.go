@@ -4,7 +4,6 @@
 package server
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,22 +21,6 @@ func init() {
 	globalThreadID = make(map[string]string)
 	imageID = ""
 	lastUpdateTime = time.Now().Unix()
-}
-
-func (srv *Server) getWEM(ctx context.Context) (string, error) {
-	if len(imageID) == 0 || time.Now().Unix()-lastUpdateTime > 60*60*24*2 {
-		mediaID, err := srv.svcs.WechatService.UpdateImage(ctx)
-		if err != nil {
-			return "", err
-		}
-		lastUpdateTime = time.Now().Unix()
-
-		time.Sleep(2000 * time.Millisecond)
-		imageID = mediaID
-
-		return mediaID, nil
-	}
-	return imageID, nil
 }
 
 // WechatCheck wechat check

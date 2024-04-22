@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/ArtisanCloud/PowerLibs/fmt"
-	"github.com/ArtisanCloud/PowerWeChat/src/kernel/power"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel/contract"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/work"
@@ -153,15 +152,4 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 	fmt.Dump("medieID", mediaID)
 	fmt.Dump("res", res)
 	return err
-}
-
-func (w *wechatService) UpdateImage(ctx context.Context) (string, error) {
-	media, err := w.weCom.Media.Upload(ctx, "image", "/usr/conf/qwewm.jpg", *power.HashMap{
-		"name": "media",
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return media.MediaID, nil
 }
