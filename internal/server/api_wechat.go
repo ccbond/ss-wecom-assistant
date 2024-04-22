@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -100,35 +99,11 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 		}
 		fmt.Println("reply", reply)
 
-		if strings.Contains(reply, "请您稍等，马上给您安排。") {
-			content := "请联系我们的客服，马上帮您安排。"
-			err = srv.svcs.WechatService.SendMsg(ctx, content, toUser, openKFID, msgID)
-			if err != nil {
-				fmt.Println("senf msg error", err)
-				panic(err)
-			}
-
-			newMediaID, err := srv.getWEM(ctx)
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println("mediaID", newMediaID)
-
-			err = srv.svcs.WechatService.TransEWM(ctx, newMediaID, toUser, openKFID, msgID)
-			if err != nil {
-				fmt.Println("send image error", err)
-				panic(err)
-			}
-
-		} else {
-			reg := regexp.MustCompile(`【.*?】`)
-			cleanedReply := reg.ReplaceAllString(reply, "")
-			err = srv.svcs.WechatService.SendMsg(ctx, cleanedReply, toUser, openKFID, msgID)
-			if err != nil {
-				fmt.Println("senf msg error", err)
-				panic(err)
-			}
+		reg := regexp.MustCompile(`【.*?】| (\*\*.+?\*\*)`)
+		cleanedReply := reg.ReplaceAllString(reply, "")
+		err = srv.svcs.WechatService.SendMsg(ctx, cleanedReply, toUser, openKFID, msgID)
+		if err != nil {
+			fmt.Println("senf msg error", err)
 		}
 	}()
 
