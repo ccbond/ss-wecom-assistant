@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"ss-wecom-assistant/internal/util/history"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -87,6 +88,15 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 		err = srv.svcs.WechatService.SendMsg(ctx, cleanedReply, toUser, openKFID, msgID)
 		if err != nil {
 			fmt.Println("senf msg error", err)
+		}
+
+		err = history.SaveMessage(&history.MessageHistory{
+			Question: content,
+			Answer:   reply,
+			UserId:   toUser,
+		})
+		if err != nil {
+			fmt.Println("save message error", err)
 		}
 	}()
 
