@@ -13,7 +13,7 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
-RUN cd /usr && mkdir conf
+RUN cd /usr && mkdir conf && cd ..
 
 COPY . .
 COPY ./conf/config.toml /usr/conf/config.toml
@@ -22,4 +22,4 @@ COPY ./asset/qwewm.jpg /usr/conf/qwewm.jpg
 RUN CGO_ENABLED=0 GOOS=linux go build -o /ss-wecom-assistant
 
 EXPOSE 1107
-CMD ["./ss-wecom-assistant", "-e", "online"]
+CMD ["/ss-wecom-assistant", "-e", "online"]
