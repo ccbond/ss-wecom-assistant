@@ -20,4 +20,5 @@ type WechatService interface {
 	SendMsg(context.Context, string, string, string, string) error
 	TransKF(context.Context, string, string, string) error
 	TransEWM(context.Context, string, string, string, string) error
+	BatchGetUserInfo(context.Context, []string) (map[string]string, error)
 }

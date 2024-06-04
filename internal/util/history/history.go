@@ -12,42 +12,14 @@ type MessageHistory struct {
 	UserId   string `json:"UserId"`
 	Question string `json:"Question"`
 	Answer   string `json:"Answer"`
+	NickName string `json:"NickName"`
 }
 
 var mu sync.Mutex
 
-func SaveMessage(newHistory *MessageHistory) error {
-	mu.Lock()
-	defer mu.Unlock()
-
-	filePath := "/data/message_history.json"
-
-	var histories []MessageHistory
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		fmt.Println("打开文件时出错:", err)
-		return err
-	}
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Println("读取文件时出错:", err)
-		return err
-	}
-
-	if len(data) > 0 {
-		err = json.Unmarshal(data, &histories)
-		if err != nil {
-			fmt.Println("解析JSON数据时出错:", err)
-			return err
-		}
-	}
-
-	histories = append(histories, *newHistory)
-
+func SaveMessage(histories []MessageHistory, file *os.File) error {
 	// 将文件指针移动到文件开始位置
-	_, err = file.Seek(0, 0)
+	_, err := file.Seek(0, 0)
 	if err != nil {
 		fmt.Println("移动文件指针时出错:", err)
 		return err
@@ -68,4 +40,27 @@ func SaveMessage(newHistory *MessageHistory) error {
 	}
 
 	return nil
+}
+
+func GetMessageHistory(file *os.File) ([]MessageHistory, error) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	var histories []MessageHistory
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Println("读取文件时出错:", err)
+		return nil, err
+	}
+
+	if len(data) > 0 {
+		err = json.Unmarshal(data, &histories)
+		if err != nil {
+			fmt.Println("解析JSON数据时出错:", err)
+			return nil, err
+		}
+	}
+
+	return histories, nil
 }

@@ -153,3 +153,18 @@ func (w *wechatService) TransEWM(ctx context.Context, mediaID string, toUser str
 	fmt.Dump("res", res)
 	return err
 }
+
+func (w *wechatService) BatchGetUserInfo(ctx context.Context, externalUserIDList []string) (map[string]string, error) {
+	userNickNameMap := make(map[string]string)
+
+	resp, err := w.weCom.AccountServiceCustomer.BatchGet(ctx, externalUserIDList)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range resp.CustomerList {
+		userNickNameMap[user.ToHashMap().Get("external_userid").(string)] = user.ToHashMap().Get("nickname").(string)
+	}
+
+	return userNickNameMap, nil
+}
