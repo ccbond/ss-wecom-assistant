@@ -166,7 +166,7 @@ func (srv *Server) getHistoryJson(ctx *gin.Context) {
 
 	nickNameMap, err := srv.svcs.WechatService.BatchGetUserInfo(ctx, emptyNickNameUser)
 	if err != nil {
-		fmt.Println("获取用户信息出错")
+		fmt.Println("获取用户信息出错", err)
 	}
 
 	for i, history := range histories {
