@@ -156,6 +156,27 @@ func (srv *Server) getHistoryJson(ctx *gin.Context) {
 		fmt.Println("获取历史消息出错:", err)
 	}
 
+	emptyNickNameUser := []string{}
+
+	for _, history := range histories {
+		if history.NickName == "" {
+			emptyNickNameUser = append(emptyNickNameUser, history.UserId)
+		}
+	}
+
+	nickNameMap, err := srv.svcs.WechatService.BatchGetUserInfo(ctx, emptyNickNameUser)
+	if err != nil {
+		fmt.Println("获取用户信息出错")
+	}
+
+	for i, history := range histories {
+		if history.NickName == "" {
+			if newNickName, ok := nickNameMap[history.UserId]; ok {
+				histories[i].NickName = newNickName
+			}
+		}
+	}
+
 	ctx.JSON(http.StatusOK, histories)
 }
 
