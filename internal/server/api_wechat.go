@@ -144,7 +144,7 @@ func (srv *Server) wechatReply(ctx *gin.Context) {
 }
 
 func (srv *Server) getHistoryJson(ctx *gin.Context) {
-	filePath := "/data/message_history.json"
+	filePath := "./data/message_history.json"
 	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("打开文件时出错:", err)
@@ -157,10 +157,14 @@ func (srv *Server) getHistoryJson(ctx *gin.Context) {
 	}
 
 	emptyNickNameUser := []string{}
+	seen := make(map[string]bool)
 
 	for _, history := range histories {
 		if history.NickName == "" {
-			emptyNickNameUser = append(emptyNickNameUser, history.UserId)
+			if !seen[history.UserId] {
+				emptyNickNameUser = append(emptyNickNameUser, history.UserId)
+				seen[history.UserId] = true
+			}
 		}
 	}
 
@@ -182,7 +186,7 @@ func (srv *Server) getHistoryJson(ctx *gin.Context) {
 
 // Reply reply text message
 func (srv *Server) getHistory(ctx *gin.Context) {
-	filePath := "/data/message_history.json"
+	filePath := "./data/message_history.json"
 	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("打开文件时出错:", err)

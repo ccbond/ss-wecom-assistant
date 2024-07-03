@@ -43,16 +43,11 @@ func (w *wechatService) Server(req *http.Request) (*http.Response, error) {
 
 func (w *wechatService) Notify(req *http.Request) (string, string, string, string, error) {
 	ctx := context.Background()
-	kfIDs, err := w.weCom.AccountService.List(ctx)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Dump("kfIDs", kfIDs)
 	openKFID := "wkiHeVBgAAckgxIrimL83KL9E10LtY0w"
 
 	token := ""
 
-	_, err = w.weCom.Server.Notify(req, func(event contract.EventInterface) interface{} {
+	_, err := w.weCom.Server.Notify(req, func(event contract.EventInterface) interface{} {
 		fmt.Dump("event", event)
 		if event.GetEvent() == models.CALLBACK_EVENT_KF_MSG_OR_EVENT && event.GetMsgType() == "text" {
 			msg := models.EventKFMsgOrEvent{}
