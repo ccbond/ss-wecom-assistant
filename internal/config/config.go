@@ -49,18 +49,29 @@ var Env string
 
 var c Config
 
+type Db struct {
+	Port     int    `toml:"port"`
+	User     string `toml:"user"`
+	Type     string `toml:"type"`
+	DbName   string `toml:"db_name"`
+	InitConn int    `toml:"init_conn"`
+	MaxConn  int    `toml:"max_conn"`
+	Host     string
+	Pwd      string
+}
+
 type Config struct {
 	API   *server.APICfg
 	Admin *server.AdminCfg
 
 	ServerConfig Server `toml:"server"`
 	LogConfig    Log    `toml:"log"`
+	DbConfig     Db     `toml:"database"`
 	WeChatConfig WeChat
 	OpenAIConfig OpenAI
 	SecretConfig Secret
 }
 
-// Init init config.
 func Init(path string) {
 	_, err := toml.DecodeFile(path, &c)
 	if err != nil {
@@ -73,6 +84,9 @@ func Init(path string) {
 			panic("Error loading .env file")
 		}
 	}
+
+	c.DbConfig.Host = os.Getenv("DATABASE_HOST")
+	c.DbConfig.Pwd = os.Getenv("DATABASE_SECRET")
 
 	wechatAgentIDStr := os.Getenv("WECHAT_AGENT_ID")
 

@@ -7,3 +7,10 @@ BasePath = ""
 Secret = ""
 [log]
 log_level = "info"
+[database]
+port = 3306
+user = "root"
+type = "mysql"
+db_name = "wxass_db"
+init_conn = 20
+max_conn = 200

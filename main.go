@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"ss-wecom-assistant/internal/config"
+	"ss-wecom-assistant/internal/datastore"
+	"ss-wecom-assistant/internal/repo"
 	"ss-wecom-assistant/internal/server"
 	"ss-wecom-assistant/internal/services"
 	"syscall"
@@ -53,6 +55,9 @@ func main() {
 	config.Init(configFilePath)
 	c := config.Get()
 
+	datastore.Init(c)
+	db := datastore.Get()
+
 	openaiClient := openai.NewClient(c.OpenAIConfig.ApiKey)
 
 	weComApp, err := work.NewWork(&work.UserConfig{
@@ -73,7 +78,13 @@ func main() {
 		ChatService:   services.NewChatService(openaiClient),
 	}
 
-	server, err := server.NewServer(c, svcs)
+	repos := &server.Repos{
+		DB:          db.DB,
+		SessionInfo: repo.NewSessionInfo(db.DB),
+		User:        repo.NewUser(db.DB),
+	}
+
+	server, err := server.NewServer(c, svcs, repos)
 	if err != nil {
 		panic("Failed to build new server, err: " + err.Error())
 	}

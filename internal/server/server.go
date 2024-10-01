@@ -6,11 +6,13 @@ package server
 import (
 	"ss-wecom-assistant/internal/config"
 	"ss-wecom-assistant/internal/logger"
+	"ss-wecom-assistant/internal/repo"
 	"ss-wecom-assistant/internal/services"
 
 	"github.com/SyntSugar/ss-infra-go/api/server"
 	"github.com/SyntSugar/ss-infra-go/log"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type Services struct {
@@ -18,15 +20,22 @@ type Services struct {
 	ChatService   services.ChatService
 }
 
+type Repos struct {
+	DB          *gorm.DB
+	SessionInfo repo.SessionInfo
+	User        repo.User
+}
+
 type Server struct {
 	apiServer *server.Server
 	logger    *log.Logger
 	config    *config.Config
 	svcs      *Services
+	repos     *Repos
 }
 
 // NewServer creates a new server instance.
-func NewServer(cfg *config.Config, services *Services) (*Server, error) {
+func NewServer(cfg *config.Config, services *Services, repos *Repos) (*Server, error) {
 	if err := logger.Init(cfg.LogConfig.LogLevel); err != nil {
 		return nil, err
 	}
@@ -43,11 +52,11 @@ func NewServer(cfg *config.Config, services *Services) (*Server, error) {
 		apiServer: apiServer,
 		config:    cfg,
 		logger:    logger.Get(),
+		repos:     repos,
 		svcs:      services,
 	}, nil
 }
 
-// Run starts the server.
 func (srv *Server) Run() error {
 	setupAPIRouters(srv)
 	if err := srv.apiServer.Run(); err != nil {

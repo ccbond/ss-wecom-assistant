@@ -1,6 +1,6 @@
 module ss-wecom-assistant
 
-go 1.21
+go 1.23
 
 require (
 	github.com/ArtisanCloud/PowerLibs v1.3.3
@@ -8,12 +8,14 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/SyntSugar/ss-infra-go v0.1.11
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/joho/godotenv v1.5.1
 	github.com/pkoukk/tiktoken-go v0.1.1
 	github.com/sashabaranov/go-openai v1.20.5
 	github.com/xuri/excelize/v2 v2.8.1
 	go.uber.org/zap v1.27.0
-	gorm.io/gorm v1.25.5
+	gorm.io/driver/mysql v1.5.7
+	gorm.io/gorm v1.25.7
 )
 
 require (
