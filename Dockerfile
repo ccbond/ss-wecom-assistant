@@ -1,13 +1,21 @@
-FROM golang:1.21 AS builder
-WORKDIR /app
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ss-wecom-assistant .
-
 FROM alpine:latest  
-RUN apk update && apk --no-cache add ca-certificates
-COPY --from=builder /app/ss-wecom-assistant /ss-wecom-assistant
-COPY ./conf/config.toml /data/ss-wecom-assistant/config.toml
-COPY ./asset/qwewm.jpg /data/ss-wecom-assistant/qwewm.jpg
+
+ENV GOLANG_VERSION 1.20
+RUN apk update && apk --no-cache --virtual .build-deps bash gcc musl-dev openssl go certificatesapk
+RUN wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz" && \
+    tar -C /usr/local -xzf go.tgz && \
+    cd /usr/local/go/src && \
+    ./make.bash && \
+    rm -rf /go.tgz
+
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /ss-wecom-assistant
 
 EXPOSE 1107
 ENTRYPOINT ["/ss-wecom-assistant", "-e", "online"]
