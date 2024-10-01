@@ -51,7 +51,7 @@ func main() {
 	registerSignal(shutdownChannel)
 	args_parse()
 
-	configFilePath := "/usr/conf/config.toml"
+	configFilePath := "/data/ss-wecom-assistant/config.toml"
 	config.Init(configFilePath)
 	c := config.Get()
 
